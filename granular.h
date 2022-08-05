@@ -17,7 +17,7 @@ public:
     /// @param position_oscillator Reference to an object that implements
     /// the Oscillator interface. This will control the position in the sample
     /// from which the grains start playing.
-    Granular(const unsigned int *sample_data, Oscillator &position_oscillator = NULL)
+    Granular(const unsigned int *sample_data = NULL, Oscillator &position_oscillator = NULL)
         : sample(sample_data),
           pos_osc(&position_oscillator)
     {
@@ -123,6 +123,9 @@ private:
 template <int N>
 int Granular<N>::trigger(uint32_t start_ms, uint32_t length_ms)
 {
+    if (sample == NULL)
+        return -1;
+        
     int i;
     for (i = 0; i < N; i++)
     {
