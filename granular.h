@@ -1,4 +1,3 @@
-#include "Oscillator.h"
 #include "granular_voice.h"
 #include <Audio.h>
 
@@ -14,12 +13,9 @@ public:
     /// @brief Constructor.
     /// @param sample_data The sample to use. An array of sample data
     /// such as that returned by wav2sketch from Teensy Audio Library.
-    /// @param position_oscillator Reference to an object that implements
-    /// the Oscillator interface. This will control the position in the sample
-    /// from which the grains start playing.
-    Granular(const unsigned int *sample_data = NULL, Oscillator &position_oscillator = NULL)
-        : sample(sample_data),
-          pos_osc(&position_oscillator)
+
+    Granular(const unsigned int *sample_data = NULL)
+        : sample(sample_data)
     {
         // Initialize the sample length
         true_sample_length_ms =
@@ -53,6 +49,7 @@ public:
     /// saturate depending on the sample data.
     void setGain(double gain);
 
+
     /// @brief Set the grain duration in milliseconds. This is the base length
     /// of each grain before it is modified by a random number 0 <= n <= duration_width_ms.
     /// @param duration The duration in milliseconds.
@@ -78,8 +75,6 @@ public:
     /// As often as possible i.e. in loop()
     void update(void);
 
-    void update(uint16_t pos);
-
     /// @brief Begin playing.
     void play(void) { playing = true; }
 
@@ -90,10 +85,11 @@ public:
     /// with AudioConnection objects. e.g. AudioConnection patchCord(granular.output, 0, i2s, 0);
     AudioMixer4 output;
 
-private:
     void setPosition(double position);
     void setPosition(uint32_t position);
     void setPosition(uint16_t position);
+
+private:
     int trigger(uint32_t start_ms, uint32_t length_ms);
     void trimSample(void)
     {
@@ -107,7 +103,6 @@ private:
     const unsigned int *sample;
     uint32_t usable_sample_length_ms;
     uint32_t true_sample_length_ms;
-    Oscillator *pos_osc;
     uint32_t position_ms;
     elapsedMillis ms;
 
@@ -208,21 +203,11 @@ void Granular<N>::setDurationWidth(uint32_t duration_width)
 template <int N>
 void Granular<N>::update(void)
 {
-    if (pos_osc != NULL)
-        update(pos_osc->value16());
-}
-
-template <int N>
-void Granular<N>::update(uint16_t pos)
-{
     if (playing)
     {
         if (ms > grain_density_ms)
         {
             ms = 0;
-
-            // Set base position from value of oscillator
-            setPosition(pos);
 
             uint32_t pos_ms, dur_ms;
 
