@@ -17,7 +17,7 @@ public:
     /// @param position_oscillator Reference to an object that implements
     /// the Oscillator interface. This will control the position in the sample
     /// from which the grains start playing.
-    Granular(const unsigned int *sample_data, Oscillator &position_oscillator)
+    Granular(const unsigned int *sample_data, Oscillator &position_oscillator = NULL)
         : sample(sample_data),
           pos_osc(&position_oscillator)
     {
@@ -77,6 +77,8 @@ public:
     /// @brief updates the state of the granular synthesis. This should be called
     /// As often as possible i.e. in loop()
     void update(void);
+
+    void update(uint16_t pos);
 
     /// @brief Begin playing.
     void play(void) { playing = true; }
@@ -203,6 +205,13 @@ void Granular<N>::setDurationWidth(uint32_t duration_width)
 template <int N>
 void Granular<N>::update(void)
 {
+    if (pos_osc != NULL)
+        update(pos_osc->value16());
+}
+
+template <int N>
+void Granular<N>::update(uint16_t pos)
+{
     if (playing)
     {
         if (ms > grain_density_ms)
@@ -210,7 +219,7 @@ void Granular<N>::update(void)
             ms = 0;
 
             // Set base position from value of oscillator
-            setPosition(pos_osc->value16());
+            setPosition(pos);
 
             uint32_t pos_ms, dur_ms;
 
