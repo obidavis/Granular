@@ -49,7 +49,6 @@ public:
     /// saturate depending on the sample data.
     void setGain(double gain);
 
-
     /// @brief Set the grain duration in milliseconds. This is the base length
     /// of each grain before it is modified by a random number 0 <= n <= duration_width_ms.
     /// @param duration The duration in milliseconds.
@@ -89,7 +88,7 @@ public:
     void setPosition(uint32_t position);
     void setPosition(uint16_t position);
 
-private:
+protected:
     int trigger(uint32_t start_ms, uint32_t length_ms);
     void trimSample(void)
     {
@@ -120,7 +119,7 @@ int Granular<N>::trigger(uint32_t start_ms, uint32_t length_ms)
 {
     if (sample == NULL)
         return -1;
-        
+
     int i;
     for (i = 0; i < N; i++)
     {
